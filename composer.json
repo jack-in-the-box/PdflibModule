@@ -1,0 +1,31 @@
+{
+    "name": "jitb/pdflib-module",
+    "description": "Zend Framework 2 Module that provides Pdflib basic functionality",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "http://www.jack.fr/",
+    "keywords": [
+        "pdflib",
+        "module",
+        "zf2"
+    ],
+    "authors": [
+        {
+            "name": "Martin Supiot",
+            "email": "msupiot@jack.fr",
+            "homepage": "http://www.jack.fr/"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5",
+    },
+    "require-dev": {
+        "zendframework/zendframework": "~2.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "PdflibModule\\": "src/"
+        }
+    }
+}
