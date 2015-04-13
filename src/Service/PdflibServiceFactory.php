@@ -37,6 +37,6 @@ class PdflibServiceFactory extends AbstractServiceFactory
      */
     public function getOptionsClass()
     {
-        return 'PdflibModule\Options\Configuration';
+        return 'Jitb\PdflibModule\Options\Configuration';
     }
 }

@@ -10,7 +10,7 @@
 return array(
     'service_manager' => array(
         'factories' =>  array(
-            'PdflibModule\Service\PdflibServiceFactory' => 'PdflibModule\Service\PdflibServiceFactory',
+            'PdflibModule\Service\PdflibService' => 'PdflibModule\Service\PdflibServiceFactory',
         ),
     ),
 );
