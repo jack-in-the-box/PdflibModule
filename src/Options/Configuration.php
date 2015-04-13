@@ -7,7 +7,7 @@
  * @author  Martin Supiot <msupiot@jack.fr>
  */
 
-namespace PdflibModule\Options;
+namespace Jitb\PdflibModule\Options;
 
 use Zend\Stdlib\AbstractOptions;
 

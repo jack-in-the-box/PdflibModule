@@ -1,7 +1,61 @@
 <?php
 /**
- * This file is placed here for compatibility with Zendframework 2's ModuleManager.
- * It allows usage of this module even without composer.
- * The original Module.php is in 'src/PdflibModule' in order to respect PSR-0
+ * Base module for integration of Pdflib projects with ZF2 applications
+ *
+ * @license MIT
+ * @link    http://www.jack.fr/
+ * @author  Martin Supiot <msupiot@jack.fr>
  */
-require_once __DIR__ . '/src/PdflibModule/Module.php';
+
+namespace Jitb\PdflibModule;
+
+use Zend\ModuleManager\Feature\InitProviderInterface;
+use Zend\ModuleManager\Feature\BootstrapListenerInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\ModuleManagerInterface;
+use Zend\EventManager\EventInterface;
+
+/**
+ * Integrate of Pdflib projects with ZF2 applications
+ */
+class Module implements ConfigProviderInterface, InitProviderInterface, BootstrapListenerInterface
+{
+    /**
+     * @var \Zend\ServiceManager\ServiceLocatorInterface
+     */
+    private $serviceManager;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function init(ModuleManagerInterface $moduleManager)
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function onBootstrap(EventInterface $event)
+    {
+        $this->serviceManager = $event->getTarget()->getServiceManager();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfig()
+    {
+        return include __DIR__ . '/config/module.config.php';
+    }
+
+    public function getAutoloaderConfig()
+    {
+        return array(
+            'Zend\Loader\StandardAutoloader' => array(
+                'namespaces' => array(
+                    __NAMESPACE__ => __DIR__ . '/src/',
+                ),
+            ),
+        );
+    }
+}

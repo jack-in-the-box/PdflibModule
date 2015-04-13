@@ -7,7 +7,7 @@
  * @author  Martin Supiot <msupiot@jack.fr>
  */
 
-namespace PdflibModule\Service;
+namespace Jitb\PdflibModule\Service;
 
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -24,7 +24,7 @@ class PdflibServiceFactory extends AbstractServiceFactory
         $key = $this->getPdflibOptions($sl)->getkey();
         $license = $this->getPdflibOptions($sl)->getLicense();
         $mp = \Pdflib::getInstance(
-            $key, 
+            $key,
             array(
                 'license' => $license,
             )

@@ -7,7 +7,7 @@
  * @author  Martin Supiot <msupiot@jack.fr>
  */
 
-namespace PdflibModule\Service;
+namespace Jitb\PdflibModule\Service;
 
 use RuntimeException;
 use Zend\ServiceManager\FactoryInterface;
