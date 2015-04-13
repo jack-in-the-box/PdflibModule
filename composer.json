@@ -24,8 +24,12 @@
         "zendframework/zendframework": "~2.3"
     },
     "autoload": {
-        "psr-0": {
-            "PdflibModule\\": "src/"
-        }
+        "psr-4": {
+            "Jitb\\PdflibModule\\": "src/",
+            "Jitb\\PdflibModule\\": "test/"
+        },
+        "classmap": [
+            "Module.php"
+        ]
     }
 }
