@@ -21,7 +21,6 @@ class PdflibServiceFactory extends AbstractServiceFactory
      */
     public function createService(ServiceLocatorInterface $sl)
     {
-        $key = $this->getPdflibOptions($sl)->getkey();
         $license = $this->getPdflibOptions($sl)->getLicense();
         $mp = \Pdflib::getInstance(
             $key,
