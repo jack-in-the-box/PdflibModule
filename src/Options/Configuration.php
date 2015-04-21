@@ -17,6 +17,7 @@ use Zend\Stdlib\AbstractOptions;
 class Configuration extends AbstractOptions
 {
     /**
+     * license key
      * @var string
      */
     protected $license = null;
