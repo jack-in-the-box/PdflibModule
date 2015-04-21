@@ -17,7 +17,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class PdflibServiceFactory extends AbstractServiceFactory
 {
     /**
-     * @return Pdflib\
+     * @return Pdf
      */
     public function createService(ServiceLocatorInterface $sl)
     {

@@ -260,4 +260,13 @@ class Pdf extends Pdflib
         else
         	$this->delete_textflow($this->textFlow);
     }
+
+    /**
+     * return current scope for debugging
+     * @return string
+     */
+    private function getCurrentScope()
+    {
+    	return ($this->get_string($this->get_option('scope', ''), ''));
+    }
 }
