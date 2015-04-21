@@ -12,18 +12,18 @@ namespace Jitb\PdflibModule\Service;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
- * Initiate a connection to a database
+ * Initiate a pdflib service
  */
 class PdflibServiceFactory extends AbstractServiceFactory
 {
     /**
-     * @return Pdflib\
+     * @return Pdf
      */
     public function createService(ServiceLocatorInterface $sl)
     {
         $license = $this->getPdflibOptions($sl)->getLicense();
-        $pdflib = new \PDFlib($license);
-        return $pdflib;
+        $pdf = new Pdf($license);
+        return $pdf;
     }
 
     /**
