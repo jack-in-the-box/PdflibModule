@@ -42,13 +42,13 @@ class Pdf extends Pdflib
     	$this->infile = 0;
     	$this->outfile = 0;
     	$this->currentPage = 0;
-    	$this->inpath = "";
-    	$this->outpath = "";
+    	$this->inpath = '';
+    	$this->outpath = '';
     	$this->currentPageNumber = 0;
     	$this->textFlow = 0;
-    	$this->set_option("errorpolicy=return");
-    	$this->set_option("stringformat=utf8");
-    	$this->set_option("escapesequence=true");
+    	$this->set_option('errorpolicy=return');
+    	$this->set_option('stringformat=utf8');
+    	$this->set_option('escapesequence=true');
     }
 
     /**
@@ -58,7 +58,7 @@ class Pdf extends Pdflib
      */
     public function getErrMsg()
     {
-        return ("Error: " + $this->get_errmsg());
+        return 'Error: ' + $this->get_errmsg();
     }
 
     /**
@@ -69,7 +69,8 @@ class Pdf extends Pdflib
      */
     public function setInfos($infos)
     {
-        foreach ($infos as $info => $value) {
+        foreach ($infos as $info => $value)
+        {
             $this->set_info($info, $value);
         }
     }
@@ -80,7 +81,7 @@ class Pdf extends Pdflib
      * @param  string $optlist (table 2.3 from the api document)
      * @return void
      */
-    public function openDocument($path, $optlist = "")
+    public function openDocument($path, $optlist = '')
     {
         $this->outpath = $path;
         if (($this->outfile = $this->begin_document($path, $optlist)) == 0) {
@@ -94,7 +95,7 @@ class Pdf extends Pdflib
      * @param  string $optlist (table 8.2 from the api document)
      * @return void
      */
-    public function openTemplate($path, $optlist = "")
+    public function openTemplate($path, $optlist = '')
     {
         $this->inpath = $path;
         if (($this->infile = $this->open_pdi_document($path, $optlist)) == 0) {
@@ -107,14 +108,14 @@ class Pdf extends Pdflib
      */
     public function getInPath()
     {
-        return ($inpath);
+        return $inpath;
     }
     /**
      * @return string path
      */
     public function getOutPath()
     {
-        return ($outpath);
+        return $outpath;
     }
 
     /**
@@ -124,11 +125,12 @@ class Pdf extends Pdflib
      * @param  string $optlist (table 8.3 from the api document)
      * @return void
      */
-    public function setCurrentPage($pageNumber, $optlist = "")
+    public function setCurrentPage($pageNumber, $optlist = '')
     {
         // Close last page until we handle pages in an array
-        if ($this->currentPage != 0)
+        if ($this->currentPage != 0) {
             $this->close_pdi_page($this->currentPage);
+        }
 
         $this->currentPageNumber = $pageNumber;
         $this->currentPage = $this->open_pdi_page($this->infile, $pageNumber, $optlist);
@@ -142,20 +144,43 @@ class Pdf extends Pdflib
      */
     public function getCurrentPage()
     {
-    	return ($this->currentPage);
+    	return $this->currentPage;
+    }
+
+    /**
+     * Used for getPropertyFromBlock
+     * TODO : save all blocks in an array ?
+     * TODO : check if a method from pdflib already exists
+     * @param  string $name
+     * @return integer
+     */
+    public function getBlockNumberFromName($name)
+    {
+    	$blockcount = $this->pcos_get_number($this->infile, 'length:pages[0]/blocks');
+    	if ($blockcount == 0) {
+        	throw new Exception('Error: Does not contain any PDFlib blocks');
+    	}
+        for ($i = 0; $i < $blockcount; $i++)
+	    {
+			$blockname = $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $i . ']/Name');
+			if ($blockname == $name) {
+				return $i;
+			}
+	    }
+	    return -1;
     }
 
     /**
      * Return property from block
-     * @param  integer $blocknumber
-     * @param  string $property
-     * @param  integer $pagenumber
+     * @param  string 	$name
+     * @param  string 	$property
+     * @param  integer 	$pagenumber
      * @return string
      */
-    public function getPropertyFromBlock($blocknumber, $property, $pagenumber = 0)
+    public function getPropertyFromBlock($name, $property, $pagenumber = 0)
     {
     	//$pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentPage);
-        return $this->pcos_get_string($this->infile, "pages[0]/blocks[" . $blocknumber . "]/". $property);
+        return $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $this->getBlockNumberFromName($name) . ']/'. $property);
     }
 
     /**
@@ -170,10 +195,10 @@ class Pdf extends Pdflib
 
     /**
      * Set template to the output document
-     * @param 	string $optlist Can be "blind" to hide images/nonblocks
+     * @param 	string $optlist Can be 'blind' to hide images/nonblocks
      * @return void
      */
-    public function initTemplate($optlist = "")
+    public function initTemplate($optlist = '')
     {
         $this->fit_pdi_page($this->currentPage, 0, 0, $optlist);
     }
@@ -182,16 +207,17 @@ class Pdf extends Pdflib
      * Allways close last page from document before this method
      * @return void
      */
-    public function addNewPageForDocument($optlist = "")
+    public function addNewPageForDocument($optlist = '')
     {
-        $width = $this->pcos_get_number($this->infile, "pages[0]/width");
-        $height = $this->pcos_get_number($this->infile, "pages[0]/height");
+        $width = $this->pcos_get_number($this->infile, 'pages[0]/width');
+        $height = $this->pcos_get_number($this->infile, 'pages[0]/height');
 
         // Add a new page to the document
         $this->begin_page_ext($width, $height, $optlist);
     }
 
     /**
+     * TODO : apply custom font
      * fill text blocks from an array of strings and blocknames
      * @param  array $blocks 'blockame' => 'content'
      * @return void
@@ -199,8 +225,7 @@ class Pdf extends Pdflib
     public function fillTextBlocks($blocks)
     {
         // Override Block properties
-        $optlist = "fontname=Helvetica-Bold encoding=unicode alignment=center " .
-        "textflowhandle=" . $this->textFlow;
+        $optlist = 'fontname=Helvetica-Bold encoding=unicode textflowhandle=' . $this->textFlow;
     	foreach ($blocks as $block => $value) {
         	$this->textFlow = $this->fill_textblock($this->currentPage, $block, $value, $optlist);
         }
@@ -215,8 +240,8 @@ class Pdf extends Pdflib
     public function fillImageBlocks($blocks)
     {
     	foreach ($blocks as $block => $value) {
-        	$image = $this->load_image("auto", $value, "");
-        	$this->fill_imageblock($this->currentPage, $block, $image, "");
+        	$image = $this->load_image('auto', $value, '');
+        	$this->fill_imageblock($this->currentPage, $block, $image, '');
         }
     }
 
@@ -226,7 +251,7 @@ class Pdf extends Pdflib
      */
     public function closeCurrentPageFromDocument()
     {
-        $this->end_page_ext("");
+        $this->end_page_ext('');
         $this->close_pdi_page($this->currentPage);
     }
 
@@ -237,7 +262,7 @@ class Pdf extends Pdflib
     public function endDocument()
     {
         $this->closeCurrentPageFromDocument();
-        $this->end_document("");       
+        $this->end_document('');       
     }
 
     /**
@@ -255,10 +280,13 @@ class Pdf extends Pdflib
      */
     private function deleteTextFlow()
     {
-    	if ($this->textFlow == 0)
-       		trigger_error("Warning: " . $this->getErrMsg());
-        else
-        	$this->delete_textflow($this->textFlow);
+    	if ($this->textFlow === 0) {
+       		trigger_error('Warning: ' . $this->getErrMsg());
+       		return false;
+    	}
+        
+        $this->delete_textflow($this->textFlow);
+        return true;
     }
 
     /**
@@ -267,6 +295,6 @@ class Pdf extends Pdflib
      */
     private function getCurrentScope()
     {
-    	return ($this->get_string($this->get_option('scope', ''), ''));
+    	return $this->get_string($this->get_option('scope', ''), '');
     }
 }
