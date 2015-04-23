@@ -14,7 +14,7 @@ use \PDFlibException as PDFlibException;
 
 class Pdf extends Pdflib
 {
-   	/**
+    /**
      * File descriptors for input/output manipulations
      * @var integer
      */
@@ -37,18 +37,18 @@ class Pdf extends Pdflib
 
     public function __construct($license)
     {
-    	parent::__construct($license);
+        parent::__construct($license);
 
-    	$this->infile = 0;
-    	$this->outfile = 0;
-    	$this->currentPage = 0;
-    	$this->inpath = '';
-    	$this->outpath = '';
-    	$this->currentPageNumber = 0;
-    	$this->textFlow = 0;
-    	$this->set_option('errorpolicy=return');
-    	$this->set_option('stringformat=utf8');
-    	$this->set_option('escapesequence=true');
+        $this->infile = 0;
+        $this->outfile = 0;
+        $this->currentPage = 0;
+        $this->inpath = '';
+        $this->outpath = '';
+        $this->currentPageNumber = 0;
+        $this->textFlow = 0;
+        $this->set_option('errorpolicy=return');
+        $this->set_option('stringformat=utf8');
+        $this->set_option('escapesequence=true');
     }
 
     /**
@@ -144,7 +144,7 @@ class Pdf extends Pdflib
      */
     public function getCurrentPage()
     {
-    	return $this->currentPage;
+        return $this->currentPage;
     }
 
     /**
@@ -156,30 +156,30 @@ class Pdf extends Pdflib
      */
     public function getBlockNumberFromName($name)
     {
-    	$blockcount = $this->pcos_get_number($this->infile, 'length:pages[0]/blocks');
-    	if ($blockcount == 0) {
-        	throw new Exception('Error: Does not contain any PDFlib blocks');
-    	}
+        $blockcount = $this->pcos_get_number($this->infile, 'length:pages[0]/blocks');
+        if ($blockcount == 0) {
+            throw new Exception('Error: Does not contain any PDFlib blocks');
+        }
         for ($i = 0; $i < $blockcount; $i++)
-	    {
-			$blockname = $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $i . ']/Name');
-			if ($blockname == $name) {
-				return $i;
-			}
-	    }
-	    return -1;
+        {
+            $blockname = $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $i . ']/Name');
+            if ($blockname == $name) {
+                return $i;
+            }
+        }
+        return -1;
     }
 
     /**
      * Return property from block
-     * @param  string 	$name
-     * @param  string 	$property
-     * @param  integer 	$pagenumber
+     * @param  string   $name
+     * @param  string   $property
+     * @param  integer  $pagenumber
      * @return string
      */
     public function getPropertyFromBlock($name, $property, $pagenumber = 0)
     {
-    	//$pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentPage);
+        //$pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentPage);
         return $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $this->getBlockNumberFromName($name) . ']/'. $property);
     }
 
@@ -195,7 +195,7 @@ class Pdf extends Pdflib
 
     /**
      * Set template to the output document
-     * @param 	string $optlist Can be 'blind' to hide images/nonblocks
+     * @param   string $optlist Can be 'blind' to hide images/nonblocks
      * @return void
      */
     public function initTemplate($optlist = '')
@@ -226,8 +226,8 @@ class Pdf extends Pdflib
     {
         // Override Block properties
         $optlist = 'fontname=Helvetica-Bold encoding=unicode textflowhandle=' . $this->textFlow;
-    	foreach ($blocks as $block => $value) {
-        	$this->textFlow = $this->fill_textblock($this->currentPage, $block, $value, $optlist);
+        foreach ($blocks as $block => $value) {
+            $this->textFlow = $this->fill_textblock($this->currentPage, $block, $value, $optlist);
         }
         $this->deleteTextFlow();
     }
@@ -239,9 +239,9 @@ class Pdf extends Pdflib
      */
     public function fillImageBlocks($blocks)
     {
-    	foreach ($blocks as $block => $value) {
-        	$image = $this->load_image('auto', $value, '');
-        	$this->fill_imageblock($this->currentPage, $block, $image, '');
+        foreach ($blocks as $block => $value) {
+            $image = $this->load_image('auto', $value, '');
+            $this->fill_imageblock($this->currentPage, $block, $image, '');
         }
     }
 
@@ -280,10 +280,10 @@ class Pdf extends Pdflib
      */
     private function deleteTextFlow()
     {
-    	if ($this->textFlow === 0) {
-       		trigger_error('Warning: ' . $this->getErrMsg());
-       		return false;
-    	}
+        if ($this->textFlow === 0) {
+            trigger_error('Warning: ' . $this->getErrMsg());
+            return false;
+        }
         
         $this->delete_textflow($this->textFlow);
         return true;
@@ -295,6 +295,6 @@ class Pdf extends Pdflib
      */
     private function getCurrentScope()
     {
-    	return $this->get_string($this->get_option('scope', ''), '');
+        return $this->get_string($this->get_option('scope', ''), '');
     }
 }
