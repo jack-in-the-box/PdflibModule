@@ -81,7 +81,7 @@ class Pdf extends Pdflib
      * @param  string $optlist (table 2.3 from the api document)
      * @return void
      */
-    public function openDocument($path, $optlist = "")
+    public function openDocument($path, $optlist = '')
     {
         $this->outpath = $path;
         if (($this->outfile = $this->begin_document($path, $optlist)) == 0) {
@@ -95,7 +95,7 @@ class Pdf extends Pdflib
      * @param  string $optlist (table 8.2 from the api document)
      * @return void
      */
-    public function openTemplate($path, $optlist = "")
+    public function openTemplate($path, $optlist = '')
     {
         $this->inpath = $path;
         if (($this->infile = $this->open_pdi_document($path, $optlist)) == 0) {
@@ -125,7 +125,7 @@ class Pdf extends Pdflib
      * @param  string $optlist (table 8.3 from the api document)
      * @return void
      */
-    public function setCurrentPage($pageNumber, $optlist = "")
+    public function setCurrentPage($pageNumber, $optlist = '')
     {
         // Close last page until we handle pages in an array
         if ($this->currentPage != 0) {
@@ -162,7 +162,7 @@ class Pdf extends Pdflib
     	}
         for ($i = 0; $i < $blockcount; $i++)
 	    {
-			$blockname = $this->pcos_get_string($this->infile, "pages[0]/blocks[" . $i . "]/Name");
+			$blockname = $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $i . ']/Name');
 			if ($blockname == $name) {
 				return $i;
 			}
@@ -180,7 +180,7 @@ class Pdf extends Pdflib
     public function getPropertyFromBlock($name, $property, $pagenumber = 0)
     {
     	//$pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentPage);
-        return $this->pcos_get_string($this->infile, "pages[0]/blocks[" . $this->getBlockNumberFromName($name) . "]/". $property);
+        return $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $this->getBlockNumberFromName($name) . ']/'. $property);
     }
 
     /**
@@ -195,7 +195,7 @@ class Pdf extends Pdflib
 
     /**
      * Set template to the output document
-     * @param 	string $optlist Can be "blind" to hide images/nonblocks
+     * @param 	string $optlist Can be 'blind' to hide images/nonblocks
      * @return void
      */
     public function initTemplate($optlist = '')
@@ -225,7 +225,7 @@ class Pdf extends Pdflib
     public function fillTextBlocks($blocks)
     {
         // Override Block properties
-        $optlist = "fontname=Helvetica-Bold encoding=unicode textflowhandle=" . $this->textFlow;
+        $optlist = 'fontname=Helvetica-Bold encoding=unicode textflowhandle=' . $this->textFlow;
     	foreach ($blocks as $block => $value) {
         	$this->textFlow = $this->fill_textblock($this->currentPage, $block, $value, $optlist);
         }
