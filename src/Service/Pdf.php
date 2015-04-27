@@ -15,25 +15,47 @@ use \PDFlibException as PDFlibException;
 class Pdf extends Pdflib
 {
     /**
-     * File descriptors for input/output manipulations
+     * File descriptors for input manipulations
      * @var integer
      */
     protected $infile;
+    /**
+     * File descriptors for output manipulations
+     * @var integer
+     */
     protected $outfile;
 
     /**
-     * File paths
+     * File inpath
      * @var string
      */
     protected $inpath;
+    /**
+     * File oupath
+     * @var string
+     */
     protected $outpath;
 
     /**
      * @var integer
      */
     protected $currentPageNumber;
+    /**
+     * @var integer
+     */
     protected $currentPage;
+    /**
+     * @var integer
+     */
     protected $textFlow;
+    /**
+     * @var integer
+     */
+    protected $templateWidth;
+    /**
+     * @var integer
+     */
+    protected $templateHeight;
 
     public function __construct($license)
     {
@@ -49,6 +71,8 @@ class Pdf extends Pdflib
         $this->set_option('errorpolicy=return');
         $this->set_option('stringformat=utf8');
         $this->set_option('escapesequence=true');
+        $this->templateWidth = 0;
+        $this->templateHeight = 0;
     }
 
     /**
@@ -101,6 +125,8 @@ class Pdf extends Pdflib
         if (($this->infile = $this->open_pdi_document($path, $optlist)) == 0) {
             throw new PDFlibException($this->getErrMsg());
         }
+        $this->templateWidth = $this->pcos_get_number($this->infile, 'pages[0]/width');
+        $this->templateHeight = $this->pcos_get_number($this->infile, 'pages[0]/height');
     }
 
     /**
@@ -198,22 +224,26 @@ class Pdf extends Pdflib
      * @param   string $optlist Can be 'blind' to hide images/nonblocks
      * @return void
      */
-    public function initTemplate($optlist = '')
+    public function initTemplate($x = 0, $y = 0, $optlist = '')
     {
-        $this->fit_pdi_page($this->currentPage, 0, 0, $optlist);
+        if ($x == 0 && $y == 0) {
+            $y = $this->templateHeight;
+        }
+        $this->fit_pdi_page($this->currentPage, $x, $y, $optlist);
     }
 
     /**
      * Allways close last page from document before this method
      * @return void
      */
-    public function addNewPageForDocument($optlist = '')
+    public function addNewPageForDocument($templateSize, $width = 0, $height = 0)
     {
-        $width = $this->pcos_get_number($this->infile, 'pages[0]/width');
-        $height = $this->pcos_get_number($this->infile, 'pages[0]/height');
-
+        if ($templateSize == true) {
+            $width = $this->templateWidth;
+            $height = $this->templateHeight;
+        }
         // Add a new page to the document
-        $this->begin_page_ext($width, $height, $optlist);
+        $this->begin_page_ext($width, $height, '');
     }
 
     /**
@@ -225,11 +255,11 @@ class Pdf extends Pdflib
     public function fillTextBlocks($blocks)
     {
         // Override Block properties
-        $optlist = 'fontname=Helvetica-Bold encoding=unicode textflowhandle=' . $this->textFlow;
+        $optlist = 'fontname=Helvetica-Bold encoding=unicode';// textflowhandle=' . $this->textFlow;
         foreach ($blocks as $block => $value) {
             $this->textFlow = $this->fill_textblock($this->currentPage, $block, $value, $optlist);
         }
-        $this->deleteTextFlow();
+        //$this->deleteTextFlow();
     }
 
     /**
@@ -241,6 +271,9 @@ class Pdf extends Pdflib
     {
         foreach ($blocks as $block => $value) {
             $image = $this->load_image('auto', $value, '');
+            if ($image == 0) {
+                trigger_error('Warning ImageBlocks: ' . $this->getErrMsg());
+            }
             $this->fill_imageblock($this->currentPage, $block, $image, '');
         }
     }
@@ -252,6 +285,15 @@ class Pdf extends Pdflib
     public function closeCurrentPageFromDocument()
     {
         $this->end_page_ext('');
+    }
+
+    /**
+     * Allways call this method before a new call to addNewPageForDocument
+     * @return void
+     */
+    public function closeCurrentPageFromTemplate()
+    {
+        $this->closeCurrentPageFromDocument();
         $this->close_pdi_page($this->currentPage);
     }
 
@@ -281,10 +323,9 @@ class Pdf extends Pdflib
     private function deleteTextFlow()
     {
         if ($this->textFlow === 0) {
-            trigger_error('Warning: ' . $this->getErrMsg());
+            trigger_error('Warning TextFlow: ' . $this->getErrMsg());
             return false;
         }
-        
         $this->delete_textflow($this->textFlow);
         return true;
     }
