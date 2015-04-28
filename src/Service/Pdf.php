@@ -314,6 +314,7 @@ class Pdf extends Pdflib
     public function closeTemplate()
     {
         $this->close_pdi_document($this->infile);
+        $this->currentPage = 0;
     }
 
     /**
