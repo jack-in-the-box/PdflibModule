@@ -339,4 +339,19 @@ class Pdf extends Pdflib
     {
         return $this->get_string($this->get_option('scope', ''), '');
     }
+
+    /**
+     * drawLine draw a line
+     * @param  double $startx
+     * @param  double $starty
+     * @param  double $endx
+     * @param  double $endy
+     * @return void
+     */
+    public function drawLine($startx, $starty, $endx, $endy)
+    {
+        $this->moveto($startx, $starty);
+        $this->lineto($endx, $endy);
+        $this->stroke();  
+    }
 }
