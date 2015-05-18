@@ -57,6 +57,23 @@ class Pdf extends Pdflib
      */
     protected $templateHeight;
 
+    /**
+     * @var integer
+     */
+    public $starttop;
+    /**
+     * @var integer
+     */
+    public $startbot;
+    /**
+     * @var integer
+     */
+    public $startleft;
+    /**
+     * @var integer
+     */
+    public $startright;
+
     public function __construct($license)
     {
         parent::__construct($license);
@@ -73,6 +90,10 @@ class Pdf extends Pdflib
         $this->set_option('escapesequence=true');
         $this->templateWidth = 0;
         $this->templateHeight = 0;
+        $this->startleft = 0;
+        $this->startright = 0;
+        $this->starttop = 0;
+        $this->startbot = 0;
     }
 
     /**
@@ -353,5 +374,13 @@ class Pdf extends Pdflib
         $this->moveto($startx, $starty);
         $this->lineto($endx, $endy);
         $this->stroke();  
+    }
+
+    public function setStartPos($top, $bot, $left, $right)
+    {
+        $this->starttop = $top;
+        $this->startbot = $bot;
+        $this->startleft = $left;
+        $this->startright = $right;
     }
 }
