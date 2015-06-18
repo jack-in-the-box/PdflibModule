@@ -418,8 +418,8 @@ class Pdf extends Pdflib
     {
         $width = $this->info_image($image, 'imagewidth', '');
         $height = $this->info_image($image, 'imageheight', '');
-        $filename = $this->info_image($image, 'filename', '');
-        $imagetype = $this->info_image($image, 'imagetype', '');
+        $filename = $this->get_string($this->info_image($image, 'filename', ''), '');
+        $imagetype = $this->get_string($this->info_image($image, 'imagetype', ''), '');
         $dpix = $this->info_image($image, 'resx', '');
         $dpiy = $this->info_image($image, 'resy', '');
 
