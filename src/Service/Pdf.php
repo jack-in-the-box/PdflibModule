@@ -114,9 +114,20 @@ class Pdf extends Pdflib
      */
     public function setInfos($infos)
     {
-        foreach ($infos as $info => $value)
-        {
+        foreach ($infos as $info => $value) {
             $this->set_info($info, $value);
+        }
+    }
+
+    /**
+     * Set options
+     * @param   Array $infos
+     * @return  void
+     */
+    public function setOptions($options)
+    {
+        foreach ($options as $option => $value) {
+            $this->set_option($option.'='.$value);
         }
     }
 
@@ -205,10 +216,9 @@ class Pdf extends Pdflib
     {
         $blockcount = $this->pcos_get_number($this->infile, 'length:pages[0]/blocks');
         if ($blockcount == 0) {
-            throw new Exception('Error: Does not contain any PDFlib blocks');
+            throw new PDFlibException('Error: Does not contain any PDFlib blocks');
         }
-        for ($i = 0; $i < $blockcount; $i++)
-        {
+        for ($i = 0; $i < $blockcount; $i++) {
             $blockname = $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $i . ']/Name');
             if ($blockname == $name) {
                 return $i;
@@ -222,11 +232,15 @@ class Pdf extends Pdflib
      * @param  string   $name
      * @param  string   $property
      * @param  integer  $pagenumber
+     * @param  string   $mode
      * @return string
      */
-    public function getPropertyFromBlock($name, $property, $pagenumber = 0)
+    public function getPropertyFromBlock($name, $property, $pagenumber = 0, $mode = 'string')
     {
-        //$pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentPage);
+        $pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentPage - 1);
+        if ($mode === 'number') {
+            return $this->pcos_get_number($this->infile, 'length:pages[0]/blocks[' . $this->getBlockNumberFromName($name) . ']/'. $property);
+        }
         return $this->pcos_get_string($this->infile, 'pages[0]/blocks[' . $this->getBlockNumberFromName($name) . ']/'. $property);
     }
 
@@ -305,7 +319,9 @@ class Pdf extends Pdflib
      */
     public function closeCurrentPageFromDocument()
     {
-        $this->end_page_ext('');
+        //if ($this->currentPage != 0) {
+            $this->end_page_ext('');
+        //}
     }
 
     /**
@@ -324,8 +340,10 @@ class Pdf extends Pdflib
      */
     public function endDocument()
     {
-        $this->closeCurrentPageFromDocument();
-        $this->end_document('');       
+        if ($this->getCurrentScope() === "page") {
+            $this->closeCurrentPageFromDocument();
+        }
+        $this->end_document('');
     }
 
     /**
@@ -356,7 +374,7 @@ class Pdf extends Pdflib
      * return current scope for debugging
      * @return string
      */
-    private function getCurrentScope()
+    public function getCurrentScope()
     {
         return $this->get_string($this->get_option('scope', ''), '');
     }
@@ -373,14 +391,51 @@ class Pdf extends Pdflib
     {
         $this->moveto($startx, $starty);
         $this->lineto($endx, $endy);
-        $this->stroke();  
+        $this->stroke();
     }
 
+    /**
+     * setStartPos Set positions where the content can be print (border + margin)
+     * @param integer $top
+     * @param integer $bot
+     * @param integer $left
+     * @param integer $right
+     */
     public function setStartPos($top, $bot, $left, $right)
     {
         $this->starttop = $top;
         $this->startbot = $bot;
         $this->startleft = $left;
         $this->startright = $right;
+    }
+
+    /**
+     * Return values of images properties
+     * @param  pdflib_image
+     * @return array properties
+     */
+    public function getImageInfo($image)
+    {
+        $width = $this->info_image($image, 'imagewidth', '');
+        $height = $this->info_image($image, 'imageheight', '');
+        $filename = $this->info_image($image, 'filename', '');
+        $imagetype = $this->info_image($image, 'imagetype', '');
+        $dpix = $this->info_image($image, 'resx', '');
+        $dpiy = $this->info_image($image, 'resy', '');
+
+        $dpix = ($dpix <= 0) ? 72 : $dpix;
+        $dpiy = ($dpiy <= 0) ? 72 : $dpiy;
+
+        $ratio = $width / $height;
+        return compact(
+            'width',
+            'height',
+            'filename',
+            'imagetype',
+            'imagetype',
+            'dpix',
+            'dpiy',
+            'ratio'
+        );
     }
 }
