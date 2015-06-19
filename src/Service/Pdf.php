@@ -245,11 +245,11 @@ class Pdf extends Pdflib
     }
 
     /**
-     * Return property from document
+     * Return property from template
      * @param  string $property
      * @return string
      */
-    public function getPropertyFromDocument($property)
+    public function getPropertyFromTemplate($property)
     {
         return $this->pcos_get_string($this->infile, $property);
     }
@@ -422,7 +422,6 @@ class Pdf extends Pdflib
         $imagetype = $this->get_string($this->info_image($image, 'imagetype', ''), '');
         $dpix = $this->info_image($image, 'resx', '');
         $dpiy = $this->info_image($image, 'resy', '');
-
         $dpix = ($dpix <= 0) ? 72 : $dpix;
         $dpiy = ($dpiy <= 0) ? 72 : $dpiy;
 
@@ -437,5 +436,63 @@ class Pdf extends Pdflib
             'dpiy',
             'ratio'
         );
+    }
+
+    /**
+     * Create an image
+     * If you want to align your image, you need to set constants HEIGHT and WIDTH corresponding to your page in your class
+     * @param  string $path         filename
+     * @param  double $x           x
+     * @param  double $y           y
+     * @param  array  $customValues height, width, fitmethod, nomargin
+     * @param  array  $alignement   center, top, right, left, bottom
+     * @return array  right-bottom corner position (x,y)
+     */
+    public function createImage($path, $x, $y, array $customValues = array(), array $alignement = array())
+    {
+        $image = $this->load_image("auto", $path, "");
+        $infos = $this->getImageInfo($image);
+        if (!isset($customValues['height']) && !isset($customValues['width'])) {
+            $customValues['height'] = ($infos['height'] / $infos['dpix']) * 72;
+            $customValues['width'] = ($infos['width'] / $infos['dpiy']) * 72;
+        } else if (!isset($customValues['width'])) {
+            $customValues['width'] = $customValues['height'] * $infos['ratio'];
+        } else if (!isset($customValues['height'])) {
+            $customValues['height'] = $customValues['width'] / $infos['ratio'];
+        } else {
+            $customValues['height'] = $customValues['width'] / $infos['ratio'];
+        }
+        $fitmethod = (!isset($customValues['fitmethod'])) ? 'fitmethod=entire' : 'fitmethod='.$customValues['fitmethod'];
+        $buf = 'boxsize={'.$customValues['width'].' '.$customValues['height'].'} '.$fitmethod;
+        $align = $this->alignImage($customValues['width'], $this->get_option('pagewidth', ''), $alignement);
+        if (!in_array('nomargin', $customValues)) {
+            $x += $this->startleft;
+            $y += $this->starttop;
+        }
+        $x += $align[0];
+        $y += $align[1];
+        // Le + $customValues['height'] sert à placer le point d'origine en haut à gauche
+        // de l'image au lieu du point en bas à gauche qui est le comportement par défaut.
+        $this->fit_image($image, $x, $y + $customValues['height'], $buf);
+        return array(
+            'x' => $x + $customValues['width'],
+            'y' => $y + $customValues['height'],
+            );
+    }
+
+    private function alignImage($imageWidth, $containerWidth, array $alignement = array())
+    {
+        $x = 0;
+        $y = 0;
+        if (in_array('center', $alignement)) {
+            $x = (1/2 * $containerWidth) - (1/2 * $imageWidth);
+        }
+        if (in_array('left', $alignement)) {
+            $x = 0;
+        }
+        if (in_array('right', $alignement)) {
+            $x = (2/3 * $containerWidth) - (1/2 * $imageWidth);
+        }
+        return array($x, $y);
     }
 }
