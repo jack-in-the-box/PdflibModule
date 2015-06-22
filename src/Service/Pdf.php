@@ -411,7 +411,7 @@ class Pdf extends Pdflib
     }
 
     /**
-     * Return values of images properties
+     * Return image properties
      * @param  pdflib_image
      * @return array properties
      */
@@ -451,8 +451,11 @@ class Pdf extends Pdflib
      */
     public function createImage($path, $x, $y, array $customValues = array(), array $alignement = array())
     {
+        // Load Image and get meta informations
         $image = $this->load_image("auto", $path, "");
         $infos = $this->getImageInfo($image);
+
+        // Set width and height by its ratio
         if (!isset($customValues['height']) && !isset($customValues['width'])) {
             $customValues['height'] = ($infos['height'] / $infos['dpix']) * 72;
             $customValues['width'] = ($infos['width'] / $infos['dpiy']) * 72;
@@ -463,24 +466,38 @@ class Pdf extends Pdflib
         } else {
             $customValues['height'] = $customValues['width'] / $infos['ratio'];
         }
+
+        // Set options
         $fitmethod = (!isset($customValues['fitmethod'])) ? 'fitmethod=entire' : 'fitmethod='.$customValues['fitmethod'];
         $buf = 'boxsize={'.$customValues['width'].' '.$customValues['height'].'} '.$fitmethod;
+        
+        // Reset positions with align
         $align = $this->alignImage($customValues['width'], $this->get_option('pagewidth', ''), $alignement);
+        $x += $align[0];
+        $y += $align[1];
+
         if (!in_array('nomargin', $customValues)) {
             $x += $this->startleft;
             $y += $this->starttop;
         }
-        $x += $align[0];
-        $y += $align[1];
+
         // Le + $customValues['height'] sert à placer le point d'origine en haut à gauche
         // de l'image au lieu du point en bas à gauche qui est le comportement par défaut.
-        $this->fit_image($image, $x, $y + $customValues['height'], $buf);
+        $this->fit_image($image, $x, $y + $customValues['height'], $buf); // render image
+
+        // Return right-bottom corner position
         return array(
             'x' => $x + $customValues['width'],
             'y' => $y + $customValues['height'],
             );
     }
 
+    /**
+     * @param  integer $imageWidth
+     * @param  integer $containerWidth
+     * @param  array  $alignement     center, left, right
+     * @return array  new positions
+     */
     private function alignImage($imageWidth, $containerWidth, array $alignement = array())
     {
         $x = 0;
