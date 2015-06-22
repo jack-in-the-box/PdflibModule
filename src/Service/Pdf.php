@@ -39,11 +39,11 @@ class Pdf extends Pdflib
     /**
      * @var integer
      */
-    protected $currentPageNumber;
+    protected $currentTemplatePageNumber;
     /**
      * @var integer
      */
-    protected $currentPage;
+    protected $currentTemplatePage;
     /**
      * @var integer
      */
@@ -80,10 +80,10 @@ class Pdf extends Pdflib
 
         $this->infile = 0;
         $this->outfile = 0;
-        $this->currentPage = 0;
+        $this->currentTemplatePage = 0;
         $this->inpath = '';
         $this->outpath = '';
-        $this->currentPageNumber = 0;
+        $this->currentTemplatePageNumber = 0;
         $this->textFlow = 0;
         $this->set_option('errorpolicy=return');
         $this->set_option('stringformat=utf8');
@@ -177,22 +177,21 @@ class Pdf extends Pdflib
     }
 
     /**
-     * [TODO] save all pages in an array to limit open calls
      * Open a specific page from current template
      * @param  integer $pageNumber
      * @param  string $optlist (table 8.3 from the api document)
      * @return void
      */
-    public function setCurrentPage($pageNumber, $optlist = '')
+    public function setCurrentTemplatePage($pageNumber, $optlist = '')
     {
         // Close last page until we handle pages in an array
-        if ($this->currentPage != 0) {
-            $this->close_pdi_page($this->currentPage);
+        if ($this->currentTemplatePage != 0) {
+            $this->close_pdi_page($this->currentTemplatePage);
         }
 
-        $this->currentPageNumber = $pageNumber;
-        $this->currentPage = $this->open_pdi_page($this->infile, $pageNumber, $optlist);
-        if ($this->currentPage == 0) {
+        $this->currentTemplatePageNumber = $pageNumber;
+        $this->currentTemplatePage = $this->open_pdi_page($this->infile, $pageNumber, $optlist);
+        if ($this->currentTemplatePage == 0) {
             throw new PDFlibException($this->getErrMsg());
         }
     }
@@ -200,9 +199,9 @@ class Pdf extends Pdflib
     /**
      * @return integer
      */
-    public function getCurrentPage()
+    public function getCurrentTemplatePage()
     {
-        return $this->currentPage;
+        return $this->currentTemplatePage;
     }
 
     /**
@@ -237,7 +236,7 @@ class Pdf extends Pdflib
      */
     public function getPropertyFromBlock($name, $property, $pagenumber = 0, $mode = 'string')
     {
-        $pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentPage - 1);
+        $pagenumber = ($pagenumber != 0 ? $pagenumber : $this->currentTemplatePage - 1);
         if ($mode === 'number') {
             return $this->pcos_get_number($this->infile, 'length:pages[0]/blocks[' . $this->getBlockNumberFromName($name) . ']/'. $property);
         }
@@ -264,7 +263,7 @@ class Pdf extends Pdflib
         if ($x == 0 && $y == 0) {
             $y = $this->templateHeight;
         }
-        $this->fit_pdi_page($this->currentPage, $x, $y, $optlist);
+        $this->fit_pdi_page($this->currentTemplatePage, $x, $y, $optlist);
     }
 
     /**
@@ -285,16 +284,18 @@ class Pdf extends Pdflib
      * TODO : apply custom font
      * fill text blocks from an array of strings and blocknames
      * @param  array $blocks 'blockame' => 'content'
+     * @param  string $optlist options
      * @return void
      */
-    public function fillTextBlocks($blocks)
+    public function fillTextBlocks($blocks, $optlist = '')
     {
         // Override Block properties
-        $optlist = 'fontname=Helvetica-Bold encoding=unicode';// textflowhandle=' . $this->textFlow;
-        foreach ($blocks as $block => $value) {
-            $this->textFlow = $this->fill_textblock($this->currentPage, $block, $value, $optlist);
+        if ($optlist === '') {
+            $optlist = 'fontname=Helvetica-Bold encoding=unicode';
         }
-        //$this->deleteTextFlow();
+        foreach ($blocks as $block => $value) {
+            $this->textFlow = $this->fill_textblock($this->currentTemplatePage, $block, $value, $optlist);
+        }
     }
 
     /**
@@ -309,7 +310,7 @@ class Pdf extends Pdflib
             if ($image == 0) {
                 trigger_error('Warning ImageBlocks: ' . $this->getErrMsg());
             }
-            $this->fill_imageblock($this->currentPage, $block, $image, '');
+            $this->fill_imageblock($this->currentTemplatePage, $block, $image, '');
         }
     }
 
@@ -331,7 +332,7 @@ class Pdf extends Pdflib
     public function closeCurrentPageFromTemplate()
     {
         $this->closeCurrentPageFromDocument();
-        $this->close_pdi_page($this->currentPage);
+        $this->close_pdi_page($this->currentTemplatePage);
     }
 
     /**
@@ -353,7 +354,7 @@ class Pdf extends Pdflib
     public function closeTemplate()
     {
         $this->close_pdi_document($this->infile);
-        $this->currentPage = 0;
+        $this->currentTemplatePage = 0;
     }
 
     /**
