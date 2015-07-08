@@ -48,7 +48,7 @@ class Pdf extends Pdflib
      */
     public function getErrMsg()
     {
-        return 'Error: ' + $this->get_errmsg();
+        return 'Error: ' . $this->get_errmsg();
     }
 
     /**

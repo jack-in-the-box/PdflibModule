@@ -75,7 +75,7 @@ class Document
     {
         $this->path = $path;
         if (($this->fd = $this->pdf->begin_document($this->path, $optlist)) == 0) {
-            throw new PDFlibException($this->getErrMsg());
+            throw new PDFlibException($this->pdf->getErrMsg());
         }
     }
 
