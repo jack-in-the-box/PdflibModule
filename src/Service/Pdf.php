@@ -27,6 +27,9 @@ class Pdf extends Pdflib
     /** @var Template */
     public $template;
 
+    /** @var string */
+    public $currentColumn;
+
     public function __construct($license)
     {
         parent::__construct($license);
@@ -39,6 +42,7 @@ class Pdf extends Pdflib
         ));
         $this->document = new Document($this);
         $this->template = new Template($this);
+        $this->currentColumn = 0;
     }
 
     /**

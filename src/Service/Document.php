@@ -80,11 +80,14 @@ class Document
     }
 
     /**
-     * Allways close last page from document before this method
+     * Create a new page
      * @return void
      */
     public function newPage($height = 0, $width = 0, $optlist = '')
     {
+        if ($this->pdf->getCurrentScope() == 'page') {
+            $this->closeCurrentPage();
+        }
         if ($width == 0 && $height == 0 && $optlist == '') {
             $optlist = "width=a4.width height=a4.height";
         }
@@ -92,7 +95,7 @@ class Document
     }
 
     /**
-     * Allways call this method before a new call to addNewPageForDocument
+     * Close current page
      * @return void
      */
     public function closeCurrentPage()
@@ -106,7 +109,7 @@ class Document
      */
     public function close()
     {
-        if ($this->pdf->getCurrentScope() === "page") {
+        if ($this->pdf->getCurrentScope() === 'page') {
             $this->closeCurrentPage();
         }
         $this->pdf->end_document('');
