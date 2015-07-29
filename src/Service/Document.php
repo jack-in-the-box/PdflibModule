@@ -91,7 +91,7 @@ class Document
         if ($width == 0 && $height == 0 && $optlist == '') {
             $optlist = "width=a4.width height=a4.height";
         }
-        $this->pdf->begin_page_ext($height, $width, $optlist);
+        $this->pdf->begin_page_ext($width, $height, $optlist);
     }
 
     /**
@@ -112,7 +112,9 @@ class Document
         if ($this->pdf->getCurrentScope() === 'page') {
             $this->closeCurrentPage();
         }
-        $this->pdf->end_document('');
+        if ($this->fd != 0) {
+            $this->pdf->end_document('');
+        }
     }
 
     /**
@@ -146,6 +148,10 @@ class Document
      */
     public function setTemplate($templatePage, $x = 0, $y = 0, $optlist = '')
     {
+        // topdown configuration
+        if ($y === 0) {
+            $y = $this->pdf->template->getHeight();
+        }
         $this->pdf->fit_pdi_page($templatePage, $x, $y, $optlist);
     }
 }

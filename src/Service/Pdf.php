@@ -73,12 +73,13 @@ class Pdf extends Pdflib
      * @param  string $optlist options
      * @return void
      */
-    public function fillTextBlocks($blocks, $optlist = '')
+    public function fillTextBlocks(array $blocks, $optlist = '')
     {
         // Override Block properties
         if ($optlist === '') {
             $optlist = 'fontname=Helvetica-Bold encoding=unicode';
         }
+        $blocks = $blocks['text'];
         foreach ($blocks as $block => $value) {
             $this->textFlow = $this->fill_textblock($this->template->currentPage, $block, $value, $optlist);
         }

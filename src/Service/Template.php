@@ -109,13 +109,13 @@ class Template
         if ($this->pdf->getCurrentScope() === "page") {
             $this->closeCurrentPage();
         }
-        $this->pdf->close_pdi_document($this->fd);
+        if ($this->fd != 0) {
+            $this->pdf->close_pdi_document($this->fd);
+        }
     }
 
     /**
      * Used for getPropertyFromBlock
-     * TODO : save all blocks in an array ?
-     * TODO : check if a method from pdflib already exists
      * @param  string $name
      * @return integer
      */
