@@ -115,6 +115,22 @@ class Template
     }
 
     /**
+     * @param  integer $pageNumber
+     * @return array
+     */
+    public function getBlockNames($pageNumber = 0)
+    {
+        $blockcount = $this->pdf->pcos_get_number($this->fd, 'length:pages['.$pageNumber.']/blocks');
+        if ($blockcount == 0) {
+            throw new PDFlibException('Error: Does not contain any PDFlib blocks');
+        }
+        for ($i = 0; $i < $blockcount; $i++) {
+            $blockname[] = $this->pdf->pcos_get_string($this->fd, 'pages['.$pageNumber.']/blocks[' . $i . ']/Name');
+        }
+        return $blockname;
+    }
+
+    /**
      * Used for getPropertyFromBlock
      * @param  string $name
      * @return integer
