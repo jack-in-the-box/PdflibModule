@@ -31,7 +31,7 @@ class PdflibService extends \Pdflib
 
     public function __construct($license)
     {
-        parent::__construct($license);
+        parent::__construct();
 
         $this->set_option("license=$license");
         $this->textFlow = 0;
