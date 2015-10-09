@@ -4,18 +4,17 @@
  *
  * @license MIT
  * @link    http://www.jack.fr/
- * @author  Corentin Deniaud <cdeniaud@jack-ext.fr>
+ * @author  Jack in the Box <dev@jack.fr>
  */
 
 namespace Jitb\PdflibModule\Service;
 
-use \Pdflib as Pdflib;
 use \PDFlibException as PDFlibException;
 
 use Jitb\PdflibModule\Service\Document;
 use Jitb\PdflibModule\Service\Template;
 
-class Pdf extends Pdflib
+class PdflibService extends \Pdflib
 {
 
     /** @var integer */
@@ -34,6 +33,7 @@ class Pdf extends Pdflib
     {
         parent::__construct($license);
 
+        $this->set_option("license=$license");
         $this->textFlow = 0;
         $this->setOptions(array(
             'errorpolicy' => 'return',

@@ -9,6 +9,8 @@
 
 namespace Jitb\PdflibModule\Service;
 
+use Jitb\PdflibModule\Service\PdflibService;
+
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -22,7 +24,7 @@ class PdflibServiceFactory extends AbstractServiceFactory
     public function createService(ServiceLocatorInterface $sl)
     {
         $license = $this->getPdflibOptions($sl)->getLicense();
-        $pdf = new Pdf($license);
+        $pdf = new PdflibService($license);
         return $pdf;
     }
 
