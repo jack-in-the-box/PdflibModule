@@ -3,7 +3,7 @@
     "description": "Zend Framework 2 Module that provides Pdflib basic functionality",
     "type": "library",
     "license": "MIT",
-    "homepage": "http://www.jack-in-the-box/expertise/logiciel",
+    "homepage": "http://www.jack-in-the-box.fr/expertise/logiciel",
     "keywords": [
         "pdflib",
         "module",
@@ -13,7 +13,7 @@
         {
             "name": "Martin Supiot",
             "email": "msupiot@jack.fr",
-            "homepage": "http://www.jack-in-the-box/expertise/logiciel"
+            "homepage": "http://www.jack-in-the-box.fr/expertise/logiciel"
         }
     ],
     "minimum-stability": "dev",
